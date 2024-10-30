@@ -1,0 +1,44 @@
+/* Layout.module.css */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #555;
+  text-align: center;
+}
+
+.link {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: #50e3c2;
+}
+
+.footer {
+  margin-top: auto;
+  padding: 0rem;
+  background-color: #f0f0f0;
+  width: 100%;
+  text-align: center;
+  color: #777;
+} 
