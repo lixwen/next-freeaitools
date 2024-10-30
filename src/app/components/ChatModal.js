@@ -1,59 +1,82 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-const ModalBackground = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  max-width: 600px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
-
-const CloseButton = styled.button`
-  background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  align-self: flex-end;
-  margin-bottom: 1rem;
-`;
-
-const ChatBox = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  margin-bottom: 1rem;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-  max-height: 280px;
-`;
-
 const Message = styled.div`
   margin-bottom: 1rem;
   text-align: ${({ sender }) => (sender === "user" ? "right" : "left")};
 `;
 
+const MessageContent = styled.div`
+  display: inline-block;
+  max-width: 80%;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background-color: ${({ sender }) =>
+    sender === "user" ? "#e3f2fd" : "#f5f5f5"};
+`;
+
+const MessageImage = styled.img`
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+`;
+
+const ModalBackground = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #f0f0f0;
+  border-radius: 4px;
+  cursor: pointer;
+  
+  &:hover {
+    background: #e0e0e0;
+  }
+`;
+
+const ChatBox = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  max-height: calc(80vh - 200px);
+`;
+
 const InputContainer = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
+  margin-top: 1rem;
 `;
 
 const InputBox = styled.input`
@@ -61,15 +84,20 @@ const InputBox = styled.input`
   padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 1rem;
 `;
 
 const SendButton = styled.button`
-  background-color: #4caf50;
+  padding: 0.5rem 1.5rem;
+  background-color: #007bff;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
+  
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 const ChatModal = ({ isOpen, onClose, modelName }) => {
@@ -81,30 +109,81 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
 
     const prompt = input;
 
-    // Add user message
-    setMessages([...messages, { sender: "user", text: input }]);
+    // 添加用户消息
+    setMessages([
+      ...messages,
+      {
+        sender: "user",
+        type: "text",
+        content: input,
+      },
+    ]);
     setInput("");
 
-    // Call AI model API
     try {
-      const response = await fetch('/api/text2text', {
-        method: 'POST',
+      const response = await fetch("/api/ai", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ prompt, modelName }),
       });
-      console.log("response: ", response);
-    
-      const aiResponse = await response.json();
 
-      // Add AI response
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { sender: "ai", text: aiResponse },
-      ]);
+      const data = await response.json();
+
+      // 根据响应类型添加不同的消息
+      if (data.type === "image") {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            sender: "ai",
+            type: "image",
+            content: data.url, // 图片URL
+          },
+        ]);
+      } else {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            sender: "ai",
+            type: "text",
+            content: data.response,
+          },
+        ]);
+      }
     } catch (error) {
       console.error("Error calling AI model:", error);
+      // 添加错误消息
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          sender: "ai",
+          type: "text",
+          content: "Sorry, an error occurred. Please try again.",
+        },
+      ]);
+    }
+  };
+
+  // 渲染消息内容
+  const renderMessageContent = (message) => {
+    switch (message.type) {
+      case "image":
+        return (
+          <MessageContent sender={message.sender}>
+            <MessageImage src={message.content} alt="AI Generated" />
+          </MessageContent>
+        );
+      case "text":
+      default:
+        return (
+          <MessageContent sender={message.sender}>
+            <p>
+              <strong>{message.sender === "user" ? "YOU" : "AI"}:</strong>{" "}
+              {message.content}
+            </p>
+          </MessageContent>
+        );
     }
   };
 
@@ -113,15 +192,12 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
   return (
     <ModalBackground>
       <ModalContent>
-        <CloseButton onClick={onClose}>关闭</CloseButton>
-        <h2>与模型对话</h2>
+        <CloseButton onClick={onClose}>Close</CloseButton>
+        <h2>Chat With AI</h2>
         <ChatBox>
           {messages.map((msg, index) => (
             <Message key={index} sender={msg.sender}>
-              <p>
-                <strong>{msg.sender === "user" ? "你" : "AI"}:</strong>{" "}
-                {msg.text}
-              </p>
+              {renderMessageContent(msg)}
             </Message>
           ))}
         </ChatBox>
@@ -130,9 +206,9 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="输入你的问题..."
+            placeholder="Input your question..."
           />
-          <SendButton onClick={handleSend}>发送</SendButton>
+          <SendButton onClick={handleSend}>Send</SendButton>
         </InputContainer>
       </ModalContent>
     </ModalBackground>
