@@ -6,10 +6,9 @@ export const models = [
   {
     title: "Text Generation",
     models: [
-      "@hf/thebloke/deepseek-coder-6.7b-base-awq",
       "@cf/qwen/qwen1.5-14b-chat-awq",
-      "@cf/deepseek-ai/deepseek-math-7b-instruct",
       "@cf/meta/llama-3.1-8b-instruct",
+      "@cf/deepseek-ai/deepseek-math-7b-instruct",
     ],
   },
   {
@@ -17,6 +16,7 @@ export const models = [
     models: [
       "@cf/lykon/dreamshaper-8-lcm",
       "@cf/black-forest-labs/flux-1-schnell",
+      "@cf/stabilityai/stable-diffusion-xl-base-1.0",
     ],
   },
 ];

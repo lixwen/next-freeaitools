@@ -17,7 +17,10 @@ export async function POST(req) {
     // 统一处理不同模型的响应格式
     switch (modelType) {
       case "Text-to-Image":
-        if (modelName === "@cf/lykon/dreamshaper-8-lcm") {
+        if (
+          modelName === "@cf/lykon/dreamshaper-8-lcm" ||
+          modelName === "@cf/stabilityai/stable-diffusion-xl-base-1.0"
+        ) {
           // 处理 ReadableStream
           const reader = response.getReader();
           const chunks = [];
@@ -81,7 +84,8 @@ export async function POST(req) {
 function buildPrompt(prompt, modelName, messages = null) {
   if (
     modelName === "@cf/lykon/dreamshaper-8-lcm" ||
-    modelName === "@cf/black-forest-labs/flux-1-schnell"
+    modelName === "@cf/black-forest-labs/flux-1-schnell" ||
+    modelName === "@cf/stabilityai/stable-diffusion-xl-base-1.0"
   ) {
     return {
       prompt: prompt,
