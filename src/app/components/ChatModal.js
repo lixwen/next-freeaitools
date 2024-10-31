@@ -132,23 +132,21 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
 
       const data = await response.json();
 
-      console.log("/api/ai response: ", data);
-
       // 根据响应类型添加不同的消息
       if (data.type === "image") {
         setMessages((prevMessages) => [
           ...prevMessages,
           {
-            sender: "ai",
+            sender: modelName,
             type: "image",
-            content: `data:image/png;base64,${data.image}`,
+            content: data.image,
           },
         ]);
       } else {
         setMessages((prevMessages) => [
           ...prevMessages,
           {
-            sender: "ai",
+            sender: modelName,
             type: "text",
             content: data.response,
           },
@@ -160,7 +158,7 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          sender: "ai",
+          sender: modelName,
           type: "text",
           content: "Sorry, an error occurred. Please try again.",
         },
@@ -177,7 +175,6 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
             <MessageImage 
               src={message.content} 
               alt="AI Generated" 
-              loading="lazy"
             />
           </MessageContent>
         );
@@ -186,7 +183,7 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
         return (
           <MessageContent sender={message.sender}>
             <p>
-              <strong>{message.sender === "user" ? "YOU" : "AI"}:</strong>{" "}
+              <strong>{message.sender === "user" ? "YOU" : message.sender}:</strong>{" "}
               {message.content}
             </p>
           </MessageContent>

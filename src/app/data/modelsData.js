@@ -1,8 +1,8 @@
 export const models = [
-  {
-    title: "Image-to-Text",
-    models: ["@cf/llava-hf/llava-1.5-7b-hf", "@cf/unum/uform-gen2-qwen-500m"],
-  },
+  // {
+  //   title: "Image-to-Text",
+  //   models: ["@cf/llava-hf/llava-1.5-7b-hf", "@cf/unum/uform-gen2-qwen-500m"],
+  // },
   {
     title: "Text Generation",
     models: [

@@ -11,6 +11,9 @@ importers:
       next:
         specifier: 14.2.5
         version: 14.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      random-js:
+        specifier: ^2.1.0
+        version: 2.1.0
       react:
         specifier: ^18
         version: 18.3.1
@@ -1624,6 +1627,9 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
+
+  random-js@2.1.0:
+    resolution: {integrity: sha512-CRUyWmnzmZBA7RZSVGq0xMqmgCyPPxbiKNLFA5ud7KenojVX2s7Gv+V7eB52beKTPGxWRnVZ7D/tCIgYJJ8vNQ==}
 
   raw-body@2.4.1:
     resolution: {integrity: sha512-9WmIKF6mkvA0SLmA2Knm9+qj89e+j1zqgyn8aXGd7+nAduPoqgI9lO57SAZNn/Byzo5P7JhXTyg9PzaJbH73bA==}
@@ -3510,6 +3516,8 @@ snapshots:
   punycode@2.3.1: {}
 
   queue-microtask@1.2.3: {}
+
+  random-js@2.1.0: {}
 
   raw-body@2.4.1:
     dependencies:

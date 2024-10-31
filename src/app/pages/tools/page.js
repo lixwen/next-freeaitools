@@ -22,6 +22,9 @@ const Tools = () => {
     <div className={styles.container}>
       <main>
         <h1>AI Tools</h1>
+        <p style={{ textAlign: "center", fontSize: "1rem", color: "#666" }}>
+          Free AI Tools Platform based on Cloudflare AI
+        </p>
         {models.map((category) => (
           <div className={styles.modelContainer} key={category.title}>
             <h2>{category.title}</h2>
