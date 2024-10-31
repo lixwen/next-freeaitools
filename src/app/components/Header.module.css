@@ -3,13 +3,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.5rem 2rem;
-  background: linear-gradient(90deg, #4a90e2, #50e3c2);
+  padding: 1rem;
+  background: linear-gradient(90deg, #4a90e2 0%, #63d8cf 100%);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
   width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  overflow-x: hidden;
 }
 
 .title {

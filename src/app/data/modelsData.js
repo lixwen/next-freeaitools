@@ -20,3 +20,12 @@ export const models = [
     ],
   },
 ];
+
+export function getModelType(modelName) {
+  for (const category of models) {
+    if (category.models.includes(modelName)) {
+      return category.title;
+    }
+  }
+  return null;
+}

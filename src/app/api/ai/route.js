@@ -1,25 +1,17 @@
 export const runtime = "edge";
 
-import { models } from "../../data/modelsData";
+import { getModelType } from "../../data/modelsData";
 import { NextResponse } from "next/server";
-
-// 辅助函数：获取模型类型
-function getModelType(modelName) {
-  for (const category of models) {
-    if (category.models.includes(modelName)) {
-      return category.title;
-    }
-  }
-  return null;
-}
 
 export async function POST(req) {
   try {
-    const { prompt, modelName } = await req.json();
+    const { prompt, modelName, messages } = await req.json();
+
     const modelType = getModelType(modelName);
 
-    // 构建不同模型的输入格式
-    const input = buildPrompt(prompt, modelName);
+    // 根据模型类型构建不同的输入格式
+    const input = buildPrompt(prompt, modelName, messages);
+    console.log("input: ", input);
     const response = await process.env.AI.run(modelName, input);
 
     // 统一处理不同模型的响应格式
@@ -86,7 +78,7 @@ export async function POST(req) {
 }
 
 // 构建不同模型的输入格式
-function buildPrompt(prompt, modelName) {
+function buildPrompt(prompt, modelName, messages = null) {
   if (
     modelName === "@cf/lykon/dreamshaper-8-lcm" ||
     modelName === "@cf/black-forest-labs/flux-1-schnell"
@@ -95,18 +87,14 @@ function buildPrompt(prompt, modelName) {
       prompt: prompt,
       height: 768,
       width: 1024,
-      // seed: initSeed(),
     };
   }
 
+  // 文本生成模型使用完整对话历史
   return {
-    messages: [
+    messages: messages || [
       { role: "system", content: "You are a friendly assistant" },
       { role: "user", content: prompt },
     ],
   };
-}
-
-function initSeed() {
-  return Math.floor(Math.random() * 10000000);
 }
