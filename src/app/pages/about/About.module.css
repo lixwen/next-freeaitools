@@ -23,21 +23,6 @@
   font-size: 2.5rem;
 }
 
-.card {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-
-.card p {
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-  font-size: 1.1rem;
-}
-
 .link {
   display: inline-block;
   padding: 0.8rem 1.5rem;
@@ -70,12 +55,4 @@
   .content h1 {
     font-size: 2rem;
   }
-
-  .card {
-    padding: 1.5rem;
-  }
-
-  .card p {
-    font-size: 1rem;
-  }
-} 
+}
