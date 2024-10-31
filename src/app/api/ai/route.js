@@ -15,11 +15,10 @@ function getModelType(modelName) {
 export async function POST(request) {
   const { prompt, modelName } = await request.json();
   const modelType = getModelType(modelName);
-
+  console.log("prompt: {}, modelName: {}", prompt, modelName);
   try {
-    const response = await context.env.AI.run(modelName, {
-      messages: [{ role: "user", content: prompt }],
-    });
+    const input = buildPrompt(prompt, modelName);
+    const response = await process.env.AI.run(modelName, input);
 
     // 根据模型类型返回不同格式的响应
     switch (modelType) {
@@ -27,7 +26,7 @@ export async function POST(request) {
         return new Response(
           JSON.stringify({
             type: "image",
-            url: response,
+            image: response.image,
           }),
           {
             status: 200,
@@ -41,7 +40,7 @@ export async function POST(request) {
         return new Response(
           JSON.stringify({
             type: "text",
-            response: response,
+            response: response.response,
           }),
           {
             status: 200,
@@ -62,4 +61,16 @@ export async function POST(request) {
       }
     );
   }
+}
+
+function buildPrompt(prompt, modelName) {
+  if (modelName === "@cf/black-forest-labs/flux-1-schnell") {
+    return {
+      prompt: prompt,
+    }
+  }
+
+  return {
+    messages: [{ role: "user", content: prompt }],
+  };
 }

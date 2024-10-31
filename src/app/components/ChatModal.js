@@ -129,7 +129,10 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
         body: JSON.stringify({ prompt, modelName }),
       });
 
+
       const data = await response.json();
+
+      console.log("/api/ai response: ", data);
 
       // 根据响应类型添加不同的消息
       if (data.type === "image") {
@@ -138,7 +141,7 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
           {
             sender: "ai",
             type: "image",
-            content: data.url, // 图片URL
+            content: `data:image/png;base64,${data.image}`,
           },
         ]);
       } else {
@@ -171,7 +174,11 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
       case "image":
         return (
           <MessageContent sender={message.sender}>
-            <MessageImage src={message.content} alt="AI Generated" />
+            <MessageImage 
+              src={message.content} 
+              alt="AI Generated" 
+              loading="lazy"
+            />
           </MessageContent>
         );
       case "text":
