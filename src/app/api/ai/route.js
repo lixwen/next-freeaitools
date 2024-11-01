@@ -66,13 +66,9 @@ export async function POST(req) {
         });
     }
   } catch (error) {
-    console.error("Error details:", error);
-    console.log("Response type:", typeof response);
-    console.log("Response value:", response);
-
     return NextResponse.json(
       {
-        type: "text",
+        type: "error",
         error: error.message,
       },
       { status: 500 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { getModelType } from "../data/modelsData";
 import ReactMarkdown from 'react-markdown';
@@ -7,7 +7,7 @@ import rehypeHighlight from 'rehype-highlight';
 
 const Message = styled.div`
   margin-bottom: 1rem;
-  text-align: ${({ sender }) => (sender === "user" ? "right" : "left")};
+  text-align: ${({ $sender }) => ($sender === "user" ? "right" : "left")};
 `;
 
 const MessageContent = styled.div`
@@ -15,13 +15,13 @@ const MessageContent = styled.div`
   max-width: 80%;
   padding: 0.8rem 1.2rem;
   border-radius: 12px;
-  background: ${({ sender }) =>
-    sender === "user" 
+  background: ${({ $sender }) =>
+    $sender === "user" 
       ? "linear-gradient(90deg, #4a90e2 0%, #63d8cf 100%)"
       : "#ffffff"};
-  color: ${({ sender }) => (sender === "user" ? "#ffffff" : "#333333")};
+  color: ${({ $sender }) => ($sender === "user" ? "#ffffff" : "#333333")};
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: ${({ sender }) => (sender === "user" ? "none" : "1px solid #e0e0e0")};
+  border: ${({ $sender }) => ($sender === "user" ? "none" : "1px solid #e0e0e0")};
 
   p {
     margin: 0;
@@ -29,7 +29,7 @@ const MessageContent = styled.div`
   }
 
   strong {
-    color: ${({ sender }) => (sender === "user" ? "#ffffff" : "#4a90e2")};
+    color: ${({ $sender }) => ($sender === "user" ? "#ffffff" : "#4a90e2")};
   }
 `;
 
@@ -314,16 +314,103 @@ const MarkdownContent = styled.div`
   }
 `;
 
+// 添加错误提示组件
+const ErrorToast = styled.div`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #ff6b6b;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 1100;
+  max-width: 400px;
+  animation: slideIn 0.3s ease;
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+`;
+
+const CloseErrorButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  margin-left: auto;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 1;
+  }
+`;
+
+const ErrorIcon = styled.span`
+  font-size: 1.2rem;
+`;
+
+const ErrorMessage = styled.span`
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+`;
+
 const ChatModal = ({ isOpen, onClose, modelName }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false); // 添加 loading 状态
+  const [error, setError] = useState(null);
+  const errorTimeoutRef = useRef(null);
 
   const handleClose = () => {
     setMessages([]);
     setInput("");
     onClose();
   };
+
+  // 清除错误提示的定时器
+  const clearErrorTimeout = () => {
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current);
+      errorTimeoutRef.current = null;
+    }
+  };
+
+  // 显示错误提示
+  const showError = (message) => {
+    clearErrorTimeout(); // 清除之前的定时器
+    setError(message);
+    
+    // 设置新的定时器
+    errorTimeoutRef.current = setTimeout(() => {
+      setError(null);
+    }, 5000); // 5秒后自动消失
+  };
+
+  // 手动关闭错误提示
+  const closeError = () => {
+    clearErrorTimeout();
+    setError(null);
+  };
+
+  // 组件卸载时清理
+  useEffect(() => {
+    return () => clearErrorTimeout();
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -375,7 +462,10 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
         });
 
         const data = await response.json();
-        if (data.type === "image") {
+        if (data.type === "error") {
+          showError(data.error);
+          return;
+        } else if (data.type === "image") {
           setMessages(prev => [...prev, {
             sender: modelName,
             type: "image",
@@ -384,7 +474,6 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
         }
       }
     } catch (error) {
-      console.error("Error calling AI model:", error);
       setMessages(prev => [...prev, {
         sender: modelName,
         type: "text",
@@ -411,18 +500,15 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
         return (
           <MessageContent $sender={message.sender}>
             {message.sender === "user" ? (
-              // 用户消息保持纯文本
               <p>
                 <strong>YOU:</strong> {message.content}
               </p>
             ) : (
-              // AI 消息使用 Markdown 渲染
               <MarkdownContent>
                 <strong>{message.sender}:</strong>
                 <ReactMarkdown
                   rehypePlugins={[rehypeHighlight]}
                   components={{
-                    // 自定义代码块渲染
                     code({node, inline, className, children, ...props}) {
                       const match = /language-(\w+)/.exec(className || '');
                       return !inline && match ? (
@@ -486,7 +572,7 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
         </ModalHeader>
         <ChatBox>
           {messages.map((msg, index) => (
-            <Message key={index} sender={msg.sender}>
+            <Message key={index} $sender={msg.sender}>
               {renderMessageContent(msg)}
             </Message>
           ))}
@@ -517,6 +603,13 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
           </div>
         </InputContainer>
       </ModalContent>
+      {error && (
+        <ErrorToast>
+          <ErrorIcon>⚠️</ErrorIcon>
+          <ErrorMessage>{error}</ErrorMessage>
+          <CloseErrorButton onClick={closeError}>&times;</CloseErrorButton>
+        </ErrorToast>
+      )}
     </ModalBackground>
   );
 };
