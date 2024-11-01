@@ -3,6 +3,12 @@ html, body {
   margin: 0;
 }
 
+main {
+  padding: 20px;
+  /* 添加一个背景颜色 gray-100*/
+  background-color: #f3f4f6;
+}
+
 #root, .app {
   display: flex;
   flex-direction: column;
