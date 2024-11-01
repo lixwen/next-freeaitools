@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { getModelType } from "../data/modelsData";
+import ReactMarkdown from 'react-markdown';
+import 'highlight.js/styles/github.css'; // 为代码块添加样式
+import rehypeHighlight from 'rehype-highlight';
 
 const Message = styled.div`
   margin-bottom: 1rem;
@@ -246,6 +249,71 @@ const LoadingDots = styled.div`
   }
 `;
 
+// 添加 Markdown 容器样式
+const MarkdownContent = styled.div`
+  font-size: 1rem;
+  line-height: 1.6;
+  
+  /* Markdown 样式 */
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  p {
+    margin: 0.8em 0;
+  }
+
+  code {
+    background: #f0f0f0;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: 'Consolas', monospace;
+  }
+
+  pre {
+    background: #f5f5f5;
+    padding: 1em;
+    border-radius: 8px;
+    overflow-x: auto;
+    
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+
+  ul, ol {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+  }
+
+  blockquote {
+    margin: 1em 0;
+    padding-left: 1em;
+    border-left: 4px solid #e0e0e0;
+    color: #666;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+  }
+
+  th, td {
+    border: 1px solid #e0e0e0;
+    padding: 0.5em;
+    text-align: left;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+`;
+
 const ChatModal = ({ isOpen, onClose, modelName }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -331,7 +399,7 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
     switch (message.type) {
       case "image":
         return (
-          <MessageContent sender={message.sender}>
+          <MessageContent $sender={message.sender}>
             <MessageImage 
               src={message.content} 
               alt="AI Generated" 
@@ -341,11 +409,40 @@ const ChatModal = ({ isOpen, onClose, modelName }) => {
       case "text":
       default:
         return (
-          <MessageContent sender={message.sender}>
-            <p>
-              <strong>{message.sender === "user" ? "YOU" : message.sender}:</strong>{" "}
-              {message.content}
-            </p>
+          <MessageContent $sender={message.sender}>
+            {message.sender === "user" ? (
+              // 用户消息保持纯文本
+              <p>
+                <strong>YOU:</strong> {message.content}
+              </p>
+            ) : (
+              // AI 消息使用 Markdown 渲染
+              <MarkdownContent>
+                <strong>{message.sender}:</strong>
+                <ReactMarkdown
+                  rehypePlugins={[rehypeHighlight]}
+                  components={{
+                    // 自定义代码块渲染
+                    code({node, inline, className, children, ...props}) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      return !inline && match ? (
+                        <pre>
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        </pre>
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    }
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
+              </MarkdownContent>
+            )}
           </MessageContent>
         );
     }

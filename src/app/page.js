@@ -34,7 +34,8 @@ const Home = () => {
             {category.models.map((model) => (
               <div className={styles.modelCard} key={model}>
                 <div className={styles.modelInfo}>
-                  <span>{model}</span>
+                  {/* model name @cf/qwen/qwen1.5-14b-chat-awq -> qwen1.5-14b-chat-awq */}
+                  <span>{model.split('/')[2]}</span>
                   {/* <div className={styles.tooltip}>{model}</div> */}
                 </div>
                 <button onClick={() => openModal(model)}>Use Model</button>
