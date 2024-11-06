@@ -6,7 +6,7 @@ html, body {
 main {
   padding: 20px;
   /* 添加一个背景颜色 gray-100*/
-  background-color: #f3f4f6;
+  background-color: white;
 }
 
 #root, .app {
@@ -46,7 +46,7 @@ nav ul li {
 footer {
   text-align: center;
   padding: 1rem;
-  background: #f3f4f6;
+  /* background: #f3f4f6; */
 }
 
 /* 示例样式，添加到 styles/ModelCard.module.css 或 globals.css */

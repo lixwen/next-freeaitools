@@ -125,4 +125,99 @@
   .modelCard span {
     word-break: break-all;
   }
-} 
+}
+
+/* 添加或更新以下样式 */
+.searchContainer {
+  margin: 20px 0;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: #333;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+}
+
+.modelsWrapper {
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74, 144, 226, 0.5) rgba(255, 255, 255, 0.1);
+}
+
+.loadMoreButton {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: linear-gradient(90deg, #4a90e2 0%, #63d8cf 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.loadMoreButton:hover {
+  background: linear-gradient(90deg, #357abd 0%, #50c1b8 100%);
+  transform: translateY(-1px);
+}
+
+/* 更新现有的滚动条样式 */
+.modelsWrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modelsWrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.modelsWrapper::-webkit-scrollbar-thumb {
+  background: rgba(74, 144, 226, 0.5);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.modelsWrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 144, 226, 0.7);
+}
+
+/* 确保模型卡片有足够的间距 */
+.modelCard {
+  margin-bottom: 10px;
+  transition: transform 0.2s ease;
+}
+
+.modelCard:last-child {
+  margin-bottom: 5px;
+}
+
+/* 添加平滑的加载过渡效果 */
+.modelCard {
+  transition: transform 0.2s ease;
+}
+
+.modelCard:hover {
+  transform: translateY(-2px);
+}
+
+.modelCard:active {
+  transform: translateY(0);
+}

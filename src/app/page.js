@@ -1,52 +1,44 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react';
-import ChatModal from "./components/ChatModal";
-import styles from './components/Tools.module.css';
-import { models } from './data/modelsData';
+import React from "react";
+import ChatInterface from "./components/ChatInterface";
+import SettingsButton from "./components/SettingsButton";
+import { Typography, Box } from '@mui/material';
 
 const Home = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('');
-
-  const openModal = (modelName) => {
-    setSelectedModel(modelName);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => setModalOpen(false);
-
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>
-           <span className={styles.gradient}>Welcome to Use Free AI Tools</span>
-        </h1>
-        <p className={styles.subtitle}>
-          All models are provided by Cloudflare AI and are free to use.
-        </p>
-      </div>
-
-      <div className={styles.toolsGrid}>
-        {models.map((category) => (
-          <div className={styles.modelContainer} key={category.title}>
-            <h2>{category.title}</h2>
-            {category.models.map((model) => (
-              <div className={styles.modelCard} key={model}>
-                <div className={styles.modelInfo}>
-                  {/* model name @cf/qwen/qwen1.5-14b-chat-awq -> qwen1.5-14b-chat-awq */}
-                  <span>{model.split('/')[2]}</span>
-                  {/* <div className={styles.tooltip}>{model}</div> */}
-                </div>
-                <button onClick={() => openModal(model)}>Use Model</button>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-
-      <ChatModal isOpen={isModalOpen} onClose={closeModal} modelName={selectedModel} />
-    </div>
+    <Box 
+      component="main"
+      sx={{
+        textAlign: 'center',
+        py: 2,  // 上下padding
+      }}
+    >
+      <Typography
+        variant="h2"  // 或者使用 h3，根据你需要的大小
+        component="h2"
+        sx={{
+          fontWeight: 700,
+          color: (theme) => theme.palette.text.primary,
+          mb: 2,  // 底部margin
+          // 渐变文字效果（可选）
+          background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          // 响应式字体大小
+          fontSize: {
+            xs: '2rem',     // 手机屏幕
+            sm: '2.5rem',   // 平板屏幕
+            md: '2.5rem',     // 桌面屏幕
+          },
+          mt: -3,
+        }}
+      >
+        Let's start using AI assistant
+      </Typography>
+      <ChatInterface />
+      <SettingsButton />
+    </Box>
   );
 };
 
