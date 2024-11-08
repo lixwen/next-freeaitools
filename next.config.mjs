@@ -8,6 +8,11 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  env: {
+    CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID,
+    CF_API_KEY: process.env.CF_API_KEY,
+  },
+}
 
 export default nextConfig;
