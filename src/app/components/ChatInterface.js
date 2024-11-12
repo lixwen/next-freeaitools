@@ -166,16 +166,10 @@ Let's begin! Feel free to ask any questions.`,
             });
 
           for (const line of lines) {
-
-            console.log("ori line: " + line);
-
             bufferedLine += line;
 
             try {
-
               const data = JSON.parse(bufferedLine);
-
-              console.log("bufferedLine: ", bufferedLine);
 
               if (data.type === "error") {
                 throw new Error(data.error);
