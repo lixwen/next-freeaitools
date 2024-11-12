@@ -110,7 +110,6 @@ Let's begin! Feel free to ask any questions.`,
     setIsLoading(true);
 
     try {
-      // 从 localStorage 获取用户凭证
       const cfAccountId = localStorage.getItem("cf_account_id");
       const cfApiKey = localStorage.getItem("cf_api_key");
 
@@ -118,7 +117,6 @@ Let's begin! Feel free to ask any questions.`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // 添加用户凭证到请求头
           ...(cfAccountId && { "cf-account-id": cfAccountId }),
           ...(cfApiKey && { "cf-api-key": cfApiKey }),
         },
@@ -130,32 +128,112 @@ Let's begin! Feel free to ask any questions.`,
         }),
       });
 
-      const data = await response.json();
+      // 检查Content-Type来判断是否为流式响应
+      const contentType = response.headers.get("Content-Type");
 
-      if (data.type === "error") {
-        throw new Error(data.error);
-      }
-      if (data.type === "image") {
-        const safeBase64 = data.image.replace(/[\r\n]/g, "").trim();
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            type: "image",
-            content: safeBase64,
-            isLoading: false
-          },
-        ]);
-      } else {
+      if (contentType?.includes("stream")) {
+        // 处理流式文本响应
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedContent = "";
+
+        // 添加新的 assistant 消息占位
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
             type: "text",
-            content: data.response,
-            isLoading: false
+            content: "",
+            isLoading: true,
           },
         ]);
+
+        let bufferedLine = ""; // 用来缓冲不完整的 JSON 字符串
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk
+            .split("\n")
+            .filter((line) => line.trim())
+            .map((line) => {
+              if (line.startsWith("data: ")) {
+                return line.substring(5);
+              }
+              return line;
+            });
+
+          for (const line of lines) {
+
+            console.log("ori line: " + line);
+
+            bufferedLine += line;
+
+            try {
+
+              const data = JSON.parse(bufferedLine);
+
+              console.log("bufferedLine: ", bufferedLine);
+
+              if (data.type === "error") {
+                throw new Error(data.error);
+              }
+
+              accumulatedContent += data.response || "";
+
+              setMessages((prev) => {
+                const newMessages = [...prev];
+                const lastMessage = newMessages[newMessages.length - 1];
+                if (lastMessage.role === "assistant") {
+                  lastMessage.content = accumulatedContent;
+                }
+                return newMessages;
+              });
+
+              // 清空缓冲区，因为本次已经成功解析
+              bufferedLine = "";
+
+              // 检查是否包含 "[DONE]"，如果有则退出
+              if (line.includes("[DONE]")) {
+                break;
+              }
+            } catch (e) {
+              // console.error("Error parsing chunk:", e, line);
+            }
+          }
+        }
+      } else {
+        // 处理非流式响应（包括图片）
+        const data = await response.json();
+
+        if (data.type === "error") {
+          throw new Error(data.error);
+        }
+
+        if (data.type === "image") {
+          const safeBase64 = data.image.replace(/[\r\n]/g, "").trim();
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              type: "image",
+              content: safeBase64,
+              isLoading: false,
+            },
+          ]);
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              type: "text",
+              content: data.response,
+              isLoading: false,
+            },
+          ]);
+        }
       }
     } catch (error) {
       console.error("Error:", error);
@@ -165,11 +243,20 @@ Let's begin! Feel free to ask any questions.`,
           role: "assistant",
           type: "text",
           content: `Error: ${error.message}`,
-          isLoading: false
+          isLoading: false,
         },
       ]);
     } finally {
       setIsLoading(false);
+      // 确保最后一条消息的 isLoading 状态被重置
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        const lastMessage = newMessages[newMessages.length - 1];
+        if (lastMessage.role === "assistant") {
+          lastMessage.isLoading = false;
+        }
+        return newMessages;
+      });
     }
   };
 
@@ -269,7 +356,7 @@ Let's begin! Feel free to ask any questions.`,
     }
   };
 
-  // 渲染参数配置弹��框
+  // 渲染参数配置弹框
   const renderParamsPopper = () => {
     const modelConfig = models
       .flatMap((category) => category.models)
@@ -288,9 +375,10 @@ Let's begin! Feel free to ask any questions.`,
           maxHeight: "80vh",
         }}
       >
-        <ClickAwayListener 
+        <ClickAwayListener
           onClickAway={() => {
-            if (!isConfiguring) {  // 只在非配置状态时关闭
+            if (!isConfiguring) {
+              // 只在非配置状态时关闭
               setAnchorEl(null);
               setHoveredModel(null);
             }
@@ -432,7 +520,12 @@ Let's begin! Feel free to ask any questions.`,
             ))}
 
             <Box
-              sx={{ display: "flex", justifyContent: "flex-end", mt: 2, gap: 1 }}
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                mt: 2,
+                gap: 1,
+              }}
             >
               <Button
                 size="small"
@@ -483,7 +576,7 @@ Let's begin! Feel free to ask any questions.`,
       <Paper
         elevation={3}
         sx={{
-          height: "78%", // 填充容器高度
+          height: "78%", // 填充器高度
           display: "flex",
           flexDirection: "column",
           bgcolor: "background.default",
@@ -730,7 +823,7 @@ Let's begin! Feel free to ask any questions.`,
                   sx={{
                     padding: "4px",
                     marginLeft: "-8px", // 靠近左侧选择框
-                    marginRight: "-10px", // 与输入框保���适当距离
+                    marginRight: "-10px", // 与输入框保适当距离
                     "& .MuiSvgIcon-root": {
                       color: "text.secondary", // 使用次要文本颜色
                     },
