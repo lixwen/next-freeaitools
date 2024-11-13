@@ -32,6 +32,8 @@ import SaveIcon from "@mui/icons-material/Save";
 import SettingsIcon from "@mui/icons-material/Settings";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import "highlight.js/styles/github.css";
+import ImageIcon from "@mui/icons-material/Image";
+import { grey } from "@mui/material/colors";
 
 const ChatInterface = () => {
   // 获取第一个可用的模型
@@ -64,6 +66,8 @@ Let's begin! Feel free to ask any questions.`,
   const [isConfiguring, setIsConfiguring] = useState(false);
   const selectRef = useRef(null);
   const [selectOpen, setSelectOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [visionSupported, setVisionSupported] = useState(false);
 
   useEffect(() => {
     setIsInitialized(true);
@@ -82,6 +86,7 @@ Let's begin! Feel free to ask any questions.`,
           defaultParams[param.name] = param.default;
         });
         setModelParams(defaultParams);
+        setVisionSupported(!!modelConfig.visionSupported);
       }
     }
   }, []); // 仅在组件挂载时执行一次
@@ -98,11 +103,14 @@ Let's begin! Feel free to ask any questions.`,
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || !selectedModel || isLoading) return;
+    if ((!input.trim() && !selectedFile) || !selectedModel || isLoading) return;
 
     const userMessage = {
       role: "user",
+      type: selectedFile ? "image" : "text",
       content: input,
+      // 如果有图片，添加图片预览URL
+      image: selectedFile ? URL.createObjectURL(selectedFile) : null,
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -113,6 +121,13 @@ Let's begin! Feel free to ask any questions.`,
       const cfAccountId = localStorage.getItem("cf_account_id");
       const cfApiKey = localStorage.getItem("cf_api_key");
 
+      // 如果有图片，先转换为Uint8Array
+      let imageData;
+      if (selectedFile) {
+        const buffer = await selectedFile.arrayBuffer();
+        imageData = Array.from(new Uint8Array(buffer));
+      }
+
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: {
@@ -121,10 +136,12 @@ Let's begin! Feel free to ask any questions.`,
           ...(cfApiKey && { "cf-api-key": cfApiKey }),
         },
         body: JSON.stringify({
-          prompt: input,
+          prompt: input || "Generate a caption for this image",
           modelName: selectedModel,
           messages: [...messages, userMessage],
           modelParams: modelParams,
+          image: imageData, // 添加图片数据
+          isImageAnalysis: !!selectedFile, // 标记是否为图片分析任务
         }),
       });
 
@@ -242,7 +259,6 @@ Let's begin! Feel free to ask any questions.`,
       ]);
     } finally {
       setIsLoading(false);
-      // 确保最后一条消息的 isLoading 状态被重置
       setMessages((prev) => {
         const newMessages = [...prev];
         const lastMessage = newMessages[newMessages.length - 1];
@@ -251,6 +267,7 @@ Let's begin! Feel free to ask any questions.`,
         }
         return newMessages;
       });
+      setSelectedFile(null); // 清除已选择的文件
     }
   };
 
@@ -277,6 +294,7 @@ Let's begin! Feel free to ask any questions.`,
         defaultParams[param.name] = param.default;
       });
       setModelParams(defaultParams);
+      setVisionSupported(!!modelConfig.visionSupported);
     }
   };
 
@@ -556,6 +574,16 @@ Let's begin! Feel free to ask any questions.`,
     );
   };
 
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setSelectedFile(file);
+    } else {
+      // 可以添加错误提示
+      console.error("please select a image file");
+    }
+  };
+
   return (
     <Container
       maxWidth="lg"
@@ -796,7 +824,14 @@ Let's begin! Feel free to ask any questions.`,
                 </MenuItem>
                 {models.map((category) => [
                   <ListItem key={category.title} disabled>
-                    <ListItemText primary={category.title} />
+                    <ListItemText
+                      primary={category.title}
+                      sx={{
+                        color: "grey",
+                        fontStyle: "italic",
+                        fontWeight: "bold",
+                      }}
+                    />
                   </ListItem>,
                   category.models.map((model) => (
                     <MenuItem key={model.id} value={model.id}>
@@ -856,6 +891,34 @@ Let's begin! Feel free to ask any questions.`,
                 },
               }}
             />
+
+            {/* 只在支持图片的模型中显示图片上传按钮 */}
+            {visionSupported && (
+              <>
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  id="image-upload"
+                  onChange={handleFileSelect}
+                />
+                <label htmlFor="image-upload">
+                  <IconButton
+                    component="span"
+                    disabled={!selectedModel || isLoading}
+                  >
+                    <ImageIcon />
+                  </IconButton>
+                </label>
+
+                {/* 显示选中的图片名称 */}
+                {selectedFile && (
+                  <Typography variant="caption" sx={{ ml: 1 }}>
+                    {selectedFile.name}
+                  </Typography>
+                )}
+              </>
+            )}
 
             {/* 操作按钮 */}
             <IconButton

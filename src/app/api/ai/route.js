@@ -5,19 +5,22 @@ export const runtime = "edge";
 
 export async function POST(req) {
   try {
-    const { modelName, modelParams, messages, prompt } = await req.json();
+    const { modelName, modelParams, messages, prompt, image } =
+      await req.json();
     const modelType = getModelType(modelName);
 
     const userAccountId =
       req.headers.get("cf-account-id") || process.env.CF_ACCOUNT_ID;
     const userApiKey = req.headers.get("cf-api-key") || process.env.CF_API_KEY;
 
-    const aiRequestBody = buildPrompt(prompt, modelType, messages, modelParams);
-    console.log(
-      `type: ${modelType} model: ${modelName} aiRequestBody: ${JSON.stringify(
-        aiRequestBody
-      )}`
+    const aiRequestBody = buildPrompt(
+      prompt,
+      modelType,
+      messages,
+      modelParams,
+      image
     );
+    console.log(`type: ${modelType} model: ${modelName} prompt: ${prompt}`);
 
     switch (modelType) {
       case "Text-to-Image":
@@ -57,6 +60,33 @@ export async function POST(req) {
         );
 
       case "Image-to-Text":
+        const imgToTextResponse = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${userAccountId}/ai/run/${modelName}`,
+          {
+            method: "POST",
+            body: JSON.stringify(aiRequestBody),
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userApiKey}`,
+            },
+          }
+        );
+
+        if (!imgToTextResponse.ok) {
+          const error = await imgToTextResponse.json();
+          throw new Error(error.errors?.[0]?.message || "API request failed");
+        }
+
+        const result = await imgToTextResponse.json();
+
+        return NextResponse.json(
+          {
+            type: "text",
+            response: result.result.description,
+          },
+          { status: 200 }
+        );
+
       case "Text Generation":
       default:
         const response = await fetch(
@@ -94,9 +124,23 @@ export async function POST(req) {
 }
 
 // buildPrompt 函数修改
-function buildPrompt(prompt, modelType, messages = null, modelParams = null) {
+function buildPrompt(
+  prompt,
+  modelType,
+  messages = null,
+  modelParams = null,
+  image = null
+) {
   if (modelType === "Text-to-Image") {
     return {
+      prompt: prompt,
+      ...modelParams,
+    };
+  }
+
+  if (modelType === "Image-to-Text") {
+    return {
+      image: image,
       prompt: prompt,
       ...modelParams,
     };
