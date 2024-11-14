@@ -508,11 +508,9 @@ Let's begin! Feel free to ask any questions.`,
                     value={tempParams[param.name]}
                     onChange={(e) => handleNumberChange(e, param)}
                     inputProps={{
-                      // 使用 inputProps 而不是 slotProps
-                      inputMode: "decimal", // 改为 decimal 以支持负数
+                      inputMode: "decimal",
                       step: "any", // 允许任意步进
                     }}
-                    // 添加辅���文本显示有效范围
                     helperText={`Valid range: ${param.min} to ${param.max}`}
                   />
                 ) : null}
@@ -893,7 +891,7 @@ Let's begin! Feel free to ask any questions.`,
           >
             <TextField
               multiline
-              maxRows={4}
+              maxRows={2}
               fullWidth
               value={input}
               onChange={(e) => setInput(e.target.value)}

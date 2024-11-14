@@ -11,7 +11,7 @@ const Home = () => {
       component="main"
       sx={{
         textAlign: "center",
-        py: { xs: 3, sm: 2 }, // 上下padding
+        py: { xs: 2, sm: 2 }, // 上下padding
         px: { xs: 0, sm: 0 }, // 左右padding
       }}
     >
@@ -19,19 +19,12 @@ const Home = () => {
         variant="h2" // 或者使用 h3，根据你需要的大小
         component="h2"
         sx={{
-          // 在移动端完全隐藏
-          // display: { xs: "none", sm: "block" },
-          fontWeight: 700,
-          color: (theme) => theme.palette.text.secondary,
+          fontWeight: { xs: 400, sm: 700 },
+          fontSize: { xs: '2rem', sm: '2.5rem' },
+          color: 'gray',
           mb: 2, // 底部margin
           WebkitBackgroundClip: "text",
-          // 响应式字体大小
-          fontSize: {
-            xs: "1rem", // 手机屏幕
-            sm: "2rem", // 平板屏幕
-            md: "2rem", // 桌面屏幕
-          },
-          mt: -3,
+          mt: -2,
         }}
       >
         Chat with AI
