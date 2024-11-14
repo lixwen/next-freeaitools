@@ -26,11 +26,11 @@ const About = () => {
             textAlign: 'center',
             fontWeight: { xs: 400, sm: 700 },
             fontSize: { xs: '2rem', sm: '2.5rem' },
-            mb: 4,
             background: 'gray',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mt: -3,
+            mt: -4,
+            mb: 2,
           }}
         >
           About this website

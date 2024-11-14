@@ -16,12 +16,12 @@ const Home = () => {
       }}
     >
       <Typography
-        variant="h2" // 或者使用 h3，根据你需要的大小
-        component="h2"
+        variant="h4"
+        component="h1"
         sx={{
           fontWeight: { xs: 400, sm: 700 },
-          fontSize: { xs: '2rem', sm: '2.5rem' },
-          color: 'gray',
+          fontSize: { xs: "2rem", sm: "2.5rem" },
+          color: "gray",
           mb: 2, // 底部margin
           WebkitBackgroundClip: "text",
           mt: -2,
