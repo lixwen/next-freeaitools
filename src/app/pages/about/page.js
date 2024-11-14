@@ -29,7 +29,7 @@ const About = () => {
             background: 'gray',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mt: -4,
+            mt: { xs: -2, sm: -4 },
             mb: 2,
           }}
         >

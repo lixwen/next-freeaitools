@@ -22,9 +22,9 @@ const Home = () => {
           fontWeight: { xs: 400, sm: 700 },
           fontSize: { xs: "2rem", sm: "2.5rem" },
           color: "gray",
-          mb: 2, // 底部margin
           WebkitBackgroundClip: "text",
           mt: -2,
+          mb: 2,
         }}
       >
         Chat with AI
