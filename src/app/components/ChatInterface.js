@@ -33,7 +33,6 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import "highlight.js/styles/github.css";
 import ImageIcon from "@mui/icons-material/Image";
-import { grey } from "@mui/material/colors";
 
 const ChatInterface = () => {
   // 获取第一个可用的模型
@@ -49,8 +48,6 @@ const ChatInterface = () => {
 Here's a quick guide to get started:
 1. Select an AI model
 2. Type your question or request in the input box
-3. Press the Send button or hit Enter to send your message
-4. Use the Clear button to reset the conversation
 
 Let's begin! Feel free to ask any questions.`,
     },
@@ -515,7 +512,7 @@ Let's begin! Feel free to ask any questions.`,
                       inputMode: "decimal", // 改为 decimal 以支持负数
                       step: "any", // 允许任意步进
                     }}
-                    // 添加辅助文本显示有效范围
+                    // 添加辅���文本显示有效范围
                     helperText={`Valid range: ${param.min} to ${param.max}`}
                   />
                 ) : null}
@@ -586,23 +583,27 @@ Let's begin! Feel free to ask any questions.`,
 
   return (
     <Container
+      className="chat-interface"
       maxWidth="lg"
       sx={{
-        height: "100vh",
-        marginTop: "-20px",
-        py: 2,
-        display: "flex", // 添加 flex 布局
-        flexDirection: "column", // 垂直方向排列
+        width: { xs: "100%", sm: "80%" },
+        height: { xs: "72vh", sm: "80vh" },
+        marginTop: { xs: 0, sm: "-20px" }, // 移动端去掉顶部边距
+        py: { xs: 0, sm: 2 }, // 移动端减小内边距
+        display: "flex",
+        flexDirection: "column",
+        pl: { xs: 0, sm: 2 },
+        pr: { xs: 0, sm: 2 },
       }}
     >
       <Paper
         elevation={3}
         sx={{
-          height: "78%", // 填充器高度
+          height: { xs: "85%", sm: "78%" }, // 移动端增加聊天区域高度
           display: "flex",
           flexDirection: "column",
           bgcolor: "background.default",
-          overflow: "hidden", // 防止整体溢出
+          overflow: "hidden",
         }}
       >
         {/* 消息列表区域 */}
@@ -679,7 +680,7 @@ Let's begin! Feel free to ask any questions.`,
                           sx={{
                             position: "relative",
                             width: "100%",
-                            minHeight: 200,
+                            minHeight: { xs: "100px", sm: "200px" },
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
@@ -694,8 +695,8 @@ Let's begin! Feel free to ask any questions.`,
                             }
                             alt="AI Generated Image"
                             sx={{
-                              maxWidth: "400px",
-                              maxHeight: "400px",
+                              maxWidth: { xs: "100%", sm: "400px" },
+                              maxHeight: { xs: "100%", sm: "400px" }  ,
                               objectFit: "contain",
                               borderRadius: 1,
                               transition: "opacity 0.5s",
@@ -785,92 +786,111 @@ Let's begin! Feel free to ask any questions.`,
             <div ref={messagesEndRef} />
           </Box>
         </Box>
+      </Paper>
 
-        {/* 输入区域 */}
-        <Paper
-          elevation={3}
+      {/* 输入区域 */}
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 1, sm: 1.5 }, // 移动端减小内边距
+          mt: { xs: 1, sm: 1 },
+          borderTop: 2,
+          borderColor: "divider",
+          bgcolor: "background.paper",
+          position: "relative",
+          zIndex: 1,
+          opacity: isInitialized ? 1 : 0,
+          transition: "opacity 0.2s",
+        }}
+      >
+        <Box
           sx={{
-            p: 2,
-            borderTop: 1,
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            position: "relative",
-            zIndex: 1,
-            opacity: isInitialized ? 1 : 0,
-            transition: "opacity 0.2s",
+            display: "flex",
+            flexDirection: { xs: "row", sm: "row" }, // 移动端垂直排列
+            gap: { xs: 1, sm: 2 }, // 调整间距
+            alignItems: { xs: "stretch", sm: "center" }, // 移动端拉伸对齐
           }}
         >
-          <Box
+          {/* 模型选择 */}
+          <FormControl
             sx={{
-              display: "flex",
-              gap: 2,
-              alignItems: "center",
+              width: { xs: "30%", sm: 200 }, // 移动端全宽
             }}
           >
-            {/* 模型选择 */}
-            <FormControl sx={{ width: 200 }}>
-              <InputLabel>Choose A Model</InputLabel>
-              <Select
-                ref={selectRef}
-                value={selectedModel || ""}
-                onChange={(e) => handleModelChange(e.target.value)}
-                label="Choose A Model"
-                open={selectOpen}
-                onOpen={handleSelectOpen}
-                onClose={handleSelectClose}
-              >
-                <MenuItem value="">
-                  <em>Please Choose A Model</em>
-                </MenuItem>
-                {models.map((category) => [
-                  <ListItem key={category.title} disabled>
-                    <ListItemText
-                      primary={category.title}
-                      sx={{
-                        color: "grey",
-                        fontStyle: "italic",
-                        fontWeight: "bold",
-                      }}
-                    />
-                  </ListItem>,
-                  category.models.map((model) => (
-                    <MenuItem key={model.id} value={model.id}>
-                      <span>{model.name}</span>
-                    </MenuItem>
-                  )),
-                  <Divider key={`divider-${category.title}`} />,
-                ])}
-              </Select>
-            </FormControl>
+            <InputLabel>Choose A Model</InputLabel>
+            <Select
+              ref={selectRef}
+              value={selectedModel || ""}
+              onChange={(e) => handleModelChange(e.target.value)}
+              label="Choose A Model"
+              open={selectOpen}
+              onOpen={handleSelectOpen}
+              onClose={handleSelectClose}
+              sx={{
+                height: { xs: "45px", sm: "56px" }, // 移动端减小高度
+              }}
+            >
+              <MenuItem value="">
+                <em>Please Choose A Model</em>
+              </MenuItem>
+              {models.map((category) => [
+                <ListItem key={category.title} disabled>
+                  <ListItemText
+                    primary={category.title}
+                    sx={{
+                      color: "grey",
+                      fontStyle: "italic",
+                      fontWeight: "bold",
+                    }}
+                  />
+                </ListItem>,
+                category.models.map((model) => (
+                  <MenuItem key={model.id} value={model.id}>
+                    <span>{model.name}</span>
+                  </MenuItem>
+                )),
+                <Divider key={`divider-${category.title}`} />,
+              ])}
+            </Select>
+          </FormControl>
 
-            {/* 模型参数设按钮 */}
-            {selectedModel && (
+          {/* 模型参数设置按钮 */}
+          {selectedModel && (
+            <Box
+              sx={{
+                // hidden on mobile
+                display: { xs: "none", sm: "flex" },
+                justifyContent: { xs: "flex-end", sm: "flex-start" },
+                mt: { xs: 0, sm: 0 }, // 移动端微调位置
+              }}
+            >
               <Tooltip title="Configure model's parameters" placement="top">
                 <IconButton
                   size="large"
                   onClick={(e) => handleModelHover(e, selectedModel)}
                   sx={{
                     padding: "4px",
-                    marginLeft: "-8px", // 靠近左侧选择框
-                    marginRight: "-10px", // 与输入框保适当距离
-                    "& .MuiSvgIcon-root": {
-                      color: "text.secondary", // 使用次要文本颜色
-                    },
-                    "&:hover": {
-                      backgroundColor: "action.hover",
-                      "& .MuiSvgIcon-root": {
-                        color: "primary.main", // 悬停时变为主题色
-                      },
-                    },
+                    marginLeft: { xs: 0, sm: "-8px" },
+                    marginRight: { xs: 0, sm: "-10px" },
                   }}
                 >
                   <SettingsIcon />
                 </IconButton>
               </Tooltip>
-            )}
-            {renderParamsPopper()}
+            </Box>
+          )}
 
-            {/* 消息输入框 */}
+          {renderParamsPopper()}
+
+          {/* 消息输入区域 */}
+          <Box
+            sx={{
+              display: "flex",
+              width: "100%",
+              gap: 1,
+              alignItems: "center",
+            }}
+          >
             <TextField
               multiline
               maxRows={4}
@@ -887,14 +907,14 @@ Let's begin! Feel free to ask any questions.`,
               sx={{
                 flex: 1,
                 "& .MuiInputBase-root": {
-                  height: "56px",
+                  height: { xs: "45px", sm: "56px" }, // 移动端减小高度
                 },
               }}
             />
 
-            {/* 只在支持图片的模型中显示图片上传按钮 */}
+            {/* 图片上传按钮 */}
             {visionSupported && (
-              <>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <input
                   type="file"
                   accept="image/*"
@@ -906,18 +926,12 @@ Let's begin! Feel free to ask any questions.`,
                   <IconButton
                     component="span"
                     disabled={!selectedModel || isLoading}
+                    sx={{ padding: { xs: "4px", sm: "8px" } }} // 移动端减小内边距
                   >
                     <ImageIcon />
                   </IconButton>
                 </label>
-
-                {/* 显示选中的图片名称 */}
-                {selectedFile && (
-                  <Typography variant="caption" sx={{ ml: 1 }}>
-                    {selectedFile.name}
-                  </Typography>
-                )}
-              </>
+              </Box>
             )}
 
             {/* 操作按钮 */}
@@ -925,6 +939,7 @@ Let's begin! Feel free to ask any questions.`,
               color="error"
               onClick={handleClear}
               disabled={messages.length === 0 || isLoading}
+              sx={{ padding: { xs: "4px", sm: "8px" } }}
             >
               <DeleteIcon />
             </IconButton>
@@ -932,12 +947,29 @@ Let's begin! Feel free to ask any questions.`,
             <IconButton
               color="primary"
               onClick={handleSend}
-              disabled={!selectedModel || !input.trim() || isLoading}
+              disabled={
+                !selectedModel || (!input.trim() && !selectedFile) || isLoading
+              }
+              sx={{ padding: { xs: "4px", sm: "8px" } }}
             >
               <SendIcon />
             </IconButton>
           </Box>
-        </Paper>
+        </Box>
+
+        {/* 显示选中的图片名称 */}
+        {selectedFile && (
+          <Typography
+            variant="caption"
+            sx={{
+              ml: 1,
+              display: "block",
+              mt: { xs: 1, sm: 0 },
+            }}
+          >
+            {selectedFile.name}
+          </Typography>
+        )}
       </Paper>
     </Container>
   );

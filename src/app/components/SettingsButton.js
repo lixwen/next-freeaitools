@@ -43,6 +43,7 @@ const SettingsButton = () => {
           position: 'fixed',
           bottom: 20,
           right: 20,
+          display: { xs: "none", sm: "block" },
         }}
       >
         <Settings />
