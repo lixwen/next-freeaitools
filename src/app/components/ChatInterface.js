@@ -45,10 +45,7 @@ const ChatInterface = () => {
       type: "text",
       content: `👋 Welcome to AI Assistant!
 
-Here's a quick guide to get started:
-1. Select an AI model
-2. Type your question or request in the input box
-
+I am a friendly AI assistant, ready to help you with any questions.\n
 Let's begin! Feel free to ask any questions.`,
     },
   ]);
@@ -584,8 +581,8 @@ Let's begin! Feel free to ask any questions.`,
       className="chat-interface"
       maxWidth="lg"
       sx={{
-        width: { xs: "100%", sm: "80%" },
-        height: { xs: "72vh", sm: "80vh" },
+        width: { xs: "100%", sm: "87%" },
+        height: { xs: "72vh", sm: "95vh" },
         marginTop: { xs: 0, sm: "-20px" }, // 移动端去掉顶部边距
         py: { xs: 0, sm: 2 }, // 移动端减小内边距
         display: "flex",

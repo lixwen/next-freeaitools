@@ -1,4 +1,4 @@
-import { Box, Container, Paper, Typography, Button } from '@mui/material';
+import { Box, Container, Typography, Button } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import EmailIcon from '@mui/icons-material/Email';
 
@@ -26,7 +26,7 @@ const About = () => {
             textAlign: 'center',
             fontWeight: { xs: 400, sm: 700 },
             fontSize: { xs: '2rem', sm: '2.5rem' },
-            background: 'gray',
+            background: 'black',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             mt: { xs: -2, sm: -4 },
@@ -45,20 +45,18 @@ const About = () => {
           mx: 'auto',
           width: '100%'
         }}>
-          <Paper
-            elevation={2}
+          <Box
             sx={{
-              p: 3,
               width: '100%',
+              p: 3,
               borderRadius: 2,
-              bgcolor: 'background.paper',
             }}
           >
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
               Open Source Project
             </Typography>
             <Typography variant="body1" component="p">
-              This is an open-source project. You can quickly deploy a similar website by visiting our GitHub repository.
+              This is an open-source project. You can quickly deploy a similar website by visiting our GitHub repository. All the models are powered by Cloudflare Workers AI.
             </Typography>
             <Button
               variant="contained"
@@ -69,20 +67,18 @@ const About = () => {
               sx={{
                 mt: 1,
                 textTransform: 'none',
-                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                background: 'black',
               }}
             >
               View on GitHub
             </Button>
-          </Paper>
+          </Box>
 
-          <Paper
-            elevation={2}
+          <Box
             sx={{
-              p: 3,
               width: '100%',
+              p: 3,
               borderRadius: 2,
-              bgcolor: 'background.paper',
             }}
           >
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
@@ -102,7 +98,7 @@ const About = () => {
             >
               lixu-wen@foxmail.com
             </Button>
-          </Paper>
+          </Box>
         </Box>
       </Box>
     </Container>
